@@ -62,7 +62,7 @@ class GeminiFinalTests(SimpleTestCase):
 
     def test_finalizacion_por_resultado(self):
         for texto, modo, esperado in [('Observa el suelo', 'Agrícola', 'gemini'), ('Administra 5 ml de antibiótico', 'Ganadera', 'bloqueada')]:
-            with patch.object(p, 'reservar_cuota', return_value=('2026-11-22', 'id')), patch.object(p.AdaptadorGemini, 'responder', return_value=p.ResultadoOrientacion(texto, 'gemini')), patch.object(p, 'confirmar_reserva') as confirmar:
+            with patch.dict('os.environ', {'GEMINI_API_KEY': 'clave-ficticia-para-test'}), patch.object(p.genai, 'Client'), patch.object(p, 'reservar_cuota', return_value=('2026-11-22', 'id')), patch.object(p.AdaptadorGemini, 'responder', return_value=p.ResultadoOrientacion(texto, 'gemini')), patch.object(p, 'confirmar_reserva') as confirmar:
                 r = p.generar_orientacion({**CONTEXTO, 'modo': modo}, 'Consulta de prueba')
                 self.assertEqual(r.tipo, esperado)
                 confirmar.assert_called_once_with(('2026-11-22', 'id'), bloqueada=esperado == 'bloqueada')

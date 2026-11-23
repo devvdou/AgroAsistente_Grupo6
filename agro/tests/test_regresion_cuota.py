@@ -19,7 +19,8 @@ class RegresionCuotaTests(SimpleTestCase):
     @patch('agro.services.orientation_provider.reservar_cuota')
     def test_error_contable_no_descarta_respuesta_valida(self, reservar, responder, confirmar, liberar):
         responder.return_value = ResultadoOrientacion('Respuesta válida del proveedor', 'gemini')
-        resultado = generar_orientacion(CONTEXTO, '¿Cómo revisar el riego?')
+        with patch.dict('os.environ', {'GEMINI_API_KEY': 'clave-ficticia-para-test'}), patch('agro.services.orientation_provider.genai.Client'):
+            resultado = generar_orientacion(CONTEXTO, '¿Cómo revisar el riego?')
         self.assertEqual(resultado.tipo, 'gemini')
         self.assertEqual(resultado.texto, 'Respuesta válida del proveedor')
         liberar.assert_not_called()
