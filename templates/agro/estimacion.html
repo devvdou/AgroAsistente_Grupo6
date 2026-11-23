@@ -1,0 +1,11 @@
+{% extends 'agro/base.html' %}
+{% block title %}Estimación | AgroAsistente{% endblock %}
+{% block content %}
+<header class="page-heading"><p class="kicker">Cálculo controlado</p><h1>Estimación de insumos</h1><p>Calcula una cantidad a partir de una dosis conocida. La aplicación no propone ni inventa dosis.</p></header>
+<form method="post" class="work-panel form-grid" novalidate>
+  {% csrf_token %}
+  {% for field in form %}<div class="field {% if field.errors %}field-error{% endif %}">{{ field.label_tag }}{{ field }}{% if field.help_text %}<small>{{ field.help_text }}</small>{% endif %}{% for error in field.errors %}<p class="error">{{ error }}</p>{% endfor %}</div>{% endfor %}
+  <div class="form-actions full"><button class="button" type="submit">Calcular cantidad</button></div>
+</form>
+{% if resultado %}<section class="calculation-sheet" aria-live="polite"><p class="section-number">Resultado</p><h2>{{ resultado.cantidad }} kg</h2><dl><div><dt>Fórmula</dt><dd>{{ resultado.superficie_m2 }} m² × {{ resultado.dosis_kg_m2 }} kg/m²</dd></div><div><dt>Origen declarado</dt><dd>{{ resultado.origen_dosis }}</dd></div></dl><p class="professional-note">Verifica la dosis y la unidad antes de comprar o aplicar un producto.</p></section>{% endif %}
+{% endblock %}

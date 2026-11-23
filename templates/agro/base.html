@@ -1,0 +1,59 @@
+{% load static %}
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" href="data:,">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}AgroAsistente Chile{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'agro/styles.css' %}">
+  <script src="{% static 'agro/app.js' %}" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#contenido">Saltar al contenido</a>
+  <header class="site-header">
+    <a class="brand" href="{% url 'agro:inicio' %}">
+      <span class="brand-name">AgroAsistente</span>
+      <span class="brand-subtitle">Chile · apoyo de campo</span>
+    </a>
+    <nav aria-label="Navegación principal">
+      {% if contexto %}
+        <a href="{% url 'agro:consulta' %}" {% if request.resolver_match.url_name == 'consulta' %}aria-current="page"{% endif %}>Consulta</a>
+        <a href="{% url 'agro:labores' %}" {% if request.resolver_match.url_name == 'labores' %}aria-current="page"{% endif %}>Labores</a>
+        <a href="{% url 'agro:estimacion' %}" {% if request.resolver_match.url_name == 'estimacion' %}aria-current="page"{% endif %}>Estimación</a>
+      {% else %}
+        <a href="{% url 'agro:inicio' %}" aria-current="page">Configurar predio</a>
+      {% endif %}
+    </nav>
+  </header>
+  <div class="layout">
+    <aside aria-label="Contexto actual">
+      {% if contexto %}
+      <details class="context-panel" open>
+        <summary><span>Contexto de trabajo</span><strong>{{ contexto.predio }}</strong></summary>
+        <div class="context-body">
+          <dl>
+            <div><dt>Región</dt><dd>{{ contexto.region_nombre }}</dd></div>
+            <div><dt>Producción</dt><dd>{{ contexto.modo }}</dd></div>
+            {% if contexto.modo == 'Agrícola' %}<div><dt>Cultivo</dt><dd>{{ contexto.cultivo_nombre }}</dd></div><div><dt>Superficie</dt><dd>{{ contexto.superficie_m2 }} m²</dd></div>{% endif %}
+          </dl>
+          <a class="text-link" href="{% url 'agro:inicio' %}">Editar contexto</a>
+          {% if consumo %}<p class="quota">Intentos de IA hoy: {{ consumo.intentos }}/{{ consumo.limite }}<br>Respuestas exitosas: {{ consumo.exitosas }}<br>Fallidas: {{ consumo.fallidas }}<br>Bloqueadas por seguridad: {{ consumo.bloqueadas }}</p>{% endif %}
+        </div>
+      </details>
+      {% else %}
+      <div class="setup-note">
+        <p class="section-number">01</p>
+        <h2>Antes de comenzar</h2>
+        <p>Configura un predio. Después se habilitarán consulta, labores y estimación.</p>
+      </div>
+      {% endif %}
+    </aside>
+    <main id="contenido" tabindex="-1">
+      {% if messages %}<div aria-live="polite">{% for message in messages %}<div class="message {{ message.tags }}">{{ message }}</div>{% endfor %}</div>{% endif %}
+      {% block content %}{% endblock %}
+    </main>
+  </div>
+  <footer><p>Proyecto académico · La orientación general no reemplaza la revisión de un profesional.</p></footer>
+</body>
+</html>

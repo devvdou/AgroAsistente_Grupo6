@@ -1,0 +1,21 @@
+{% extends 'agro/base.html' %}
+{% block title %}Configurar contexto | AgroAsistente{% endblock %}
+{% block content %}
+<section class="hero">
+  <p class="kicker">Punto de partida</p>
+  <h1>Configura tu predio</h1>
+  <p>Indica dónde trabajas y qué produces. Esta información acompaña cada consulta, labor y cálculo durante la sesión.</p>
+</section>
+<form method="post" action="{% url 'agro:contexto' %}" class="work-panel form-grid" novalidate>
+  {% csrf_token %}
+  {% for field in form %}
+    <div class="field {% if field.errors %}field-error{% endif %}" data-field="{{ field.name }}">
+      {{ field.label_tag }} {{ field }}
+      {% if field.help_text %}<small>{{ field.help_text }}</small>{% endif %}
+      {% for error in field.errors %}<p class="error">{{ error }}</p>{% endfor %}
+    </div>
+  {% endfor %}
+  {% for error in form.non_field_errors %}<p class="error full">{{ error }}</p>{% endfor %}
+  <div class="form-actions full"><button class="button" type="submit">Guardar y continuar</button><span>Luego podrás consultar, planificar labores y estimar insumos.</span></div>
+</form>
+{% endblock %}

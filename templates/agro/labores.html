@@ -1,0 +1,23 @@
+{% extends 'agro/base.html' %}
+{% block title %}Labores | AgroAsistente{% endblock %}
+{% block content %}
+<header class="page-heading"><p class="kicker">Plan de trabajo</p><h1>Labores</h1><p>Registra una actividad, su fecha y el estado de avance.</p></header>
+<form method="post" class="work-panel form-grid" novalidate>
+  {% csrf_token %}<input type="hidden" name="accion" value="crear">
+  {% for field in form %}<div class="field {% if field.errors %}field-error{% endif %}">{{ field.label_tag }}{{ field }}{% for error in field.errors %}<p class="error">{{ error }}</p>{% endfor %}</div>{% endfor %}
+  <div class="form-actions full"><button class="button" type="submit">Agregar labor</button></div>
+</form>
+<section class="task-list" aria-label="Lista de labores">
+  {% for labor in labores %}
+  <article class="task">
+    <div><h2>{{ labor.titulo }}</h2><p>{{ labor.fecha }} · <strong>{{ labor.estado }}</strong></p></div>
+    <form method="post">
+      {% csrf_token %}<input type="hidden" name="accion" value="estado"><input type="hidden" name="labor_id" value="{{ labor.id }}">
+      <label for="estado-{{ labor.id }}">Cambiar estado</label>
+      <select id="estado-{{ labor.id }}" name="estado"><option {% if labor.estado == 'Pendiente' %}selected{% endif %}>Pendiente</option><option {% if labor.estado == 'En curso' %}selected{% endif %}>En curso</option><option {% if labor.estado == 'Hecha' %}selected{% endif %}>Hecha</option></select>
+      <button class="button small" type="submit">Actualizar</button>
+    </form>
+  </article>
+  {% empty %}<p class="empty">Aún no hay labores registradas para este predio.</p>{% endfor %}
+</section>
+{% endblock %}

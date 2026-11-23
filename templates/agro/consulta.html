@@ -1,0 +1,37 @@
+{% extends 'agro/base.html' %}
+{% block title %}Consulta | AgroAsistente{% endblock %}
+{% block content %}
+<header class="page-heading"><p class="kicker">Orientación de campo</p><h1>Consulta</h1><p>Describe una situación concreta del predio. Evita incluir datos personales.</p></header>
+<form method="post" class="work-panel question-form" data-loading-form novalidate>
+  {% csrf_token %}
+  <div class="field {% if form.pregunta.errors %}field-error{% endif %}">
+    <label for="{{ form.pregunta.id_for_label }}">¿Qué necesitas revisar?</label> {{ form.pregunta }}
+    <div class="field-meta"><span id="contador">0/300</span></div>
+    {% for error in form.pregunta.errors %}<p class="error">{{ error }}</p>{% endfor %}
+  </div>
+  <div class="form-actions"><button class="button" type="submit" data-submit>Consultar</button><span>La respuesta puede tardar algunos segundos.</span></div>
+</form>
+
+{% if resultado %}
+<article class="answer-sheet" aria-live="polite">
+  <div class="answer-meta"><span>Origen</span>
+    {% if resultado.tipo == 'gemini' %}<strong>Respuesta generada por Gemini</strong>
+    {% elif resultado.tipo == 'bloqueada' %}<strong>Respuesta bloqueada por seguridad</strong>
+    {% else %}<strong>Orientación local de respaldo</strong>{% endif %}
+  </div>
+  <div class="answer-copy"><h2>Orientación</h2><p>{{ resultado.texto }}</p></div>
+  {% if resultado.aviso %}<p class="notice">{{ resultado.aviso }}</p>{% endif %}
+  {% if contexto.modo == 'Ganadera' %}<p class="professional-note"><strong>Revisión profesional:</strong> medicamentos, tratamientos, vacunas y dosis requieren un médico veterinario.</p>
+  {% else %}<p class="professional-note"><strong>Revisión profesional:</strong> plagas, enfermedades, pesticidas y dosis requieren un ingeniero agrónomo.</p>{% endif %}
+</article>
+{% endif %}
+
+{% if pronostico %}
+<section class="weather-section">
+  <div class="section-heading"><h2>Referencia meteorológica</h2><p>{{ pronostico.localidad }} · {{ pronostico.latitud }}, {{ pronostico.longitud }}</p></div>
+  <div class="forecast-list">{% for dia in pronostico.dias %}<div><time>{{ dia.fecha }}</time><strong>{{ dia.minima }}–{{ dia.maxima }} °C</strong><span>{{ dia.precipitacion }} mm</span></div>{% endfor %}</div>
+  <p class="updated">Actualizado {{ pronostico.actualizado }}, hora de Chile.</p>
+  <p class="source">Fuente: Open-Meteo. Es un pronóstico externo y no una certeza ni una predicción propia de esta aplicación.</p>
+</section>
+{% elif error_pronostico %}<p class="message warning-message">{{ error_pronostico }}</p>{% endif %}
+{% endblock %}
