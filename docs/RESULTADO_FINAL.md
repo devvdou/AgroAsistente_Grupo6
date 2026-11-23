@@ -23,6 +23,10 @@ Fecha: 22 de noviembre de 2026.
 
 El recorrido creó tres labores, marcó una Hecha y calculó 10 kg como `500 m² × 0,02 kg/m²`, con una dosis ficticia declarada. No hubo errores 5xx, CSRF ni pérdida de sesión.
 
+## Clonación limpia
+
+Se clonó el commit local en `Prueba Clon Limpio AgroAsistente`, una ruta distinta con espacios. `INSTALAR_WINDOWS.bat` creó un entorno desde cero y un secreto Django nuevo. Tras colocar temporalmente las credenciales privadas, `COMPROBAR_WINDOWS.bat` ejecutó 59 pruebas y `INICIAR_WINDOWS.bat` levantó Django. Desde navegador se verificaron Firebase, una respuesta real de Gemini en 4,6 s, tres días de Open-Meteo, una labor, una estimación de 10 kg y conservación del contexto. Consola: 0 errores. Las credenciales temporales fueron retiradas del clon al finalizar.
+
 ## Historias
 
 HU-01 a HU-09: **Completa y verificada**, según la evidencia automática y manual detallada en `MATRIZ_TRAZABILIDAD.md`. HU-10 a HU-12 no se implementaron.

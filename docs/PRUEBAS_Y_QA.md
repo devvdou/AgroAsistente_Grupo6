@@ -9,6 +9,7 @@ Resultados del 22 de noviembre de 2026:
 - Open-Meteo real: tres días, Talca, fuente y hora visibles.
 - Respaldo forzado: dos timeouts simulados, orientación veterinaria pertinente y contador 6 intentos / 5 éxitos / 1 fallo.
 - Navegador: contexto, consultas, labores, estimación y navegación sin pérdida de sesión; POST 200/302, sin CSRF ni 5xx.
+- Clonación limpia: `INSTALAR_WINDOWS.bat`, `COMPROBAR_WINDOWS.bat` e `INICIAR_WINDOWS.bat` verificados desde una ruta nueva con espacios; 59 pruebas, Firebase, Gemini, Open-Meteo, una labor y una estimación funcionaron. Las credenciales temporales se retiraron al terminar.
 
 | Pregunta | Proveedor | Reintento | Resultado | Intentos / éxitos / fallos | Tiempo |
 |---|---|---:|---|---|---:|

@@ -4,7 +4,7 @@
 
 Los bloqueos descritos en la auditoría inicial fueron corregidos y verificados. La cuota v2 distingue intentos, exitosas, fallidas, bloqueadas, excesos y operaciones por ID; migra estructuras antiguas y finaliza de forma idempotente. Gemini usa timeout de 25 segundos, un reintento selectivo y categorías internas. Las 59 pruebas pasan. Cinco consultas reales respondieron con Gemini; un timeout doble forzado activó un respaldo relacionado y aumentó fallidas. El recorrido real cubrió contexto, tres labores, cambio a Hecha, estimación y Open-Meteo. La evidencia final autoritativa está en `RESULTADO_FINAL.md`, `PRUEBAS_Y_QA.md` y `MATRIZ_TRAZABILIDAD.md`.
 
-El repositorio final y su clonación limpia se verificaron después de esta actualización. Las observaciones históricas que aparecen más abajo se conservan para mostrar el diagnóstico previo y no describen el estado final.
+El repositorio final y su clonación limpia se verificaron después de esta actualización: instalación nueva, 59 pruebas, BAT de arranque, Firebase, Gemini, Open-Meteo, labor y estimación funcionaron. Las credenciales temporales se retiraron del clon. Las observaciones históricas que aparecen más abajo se conservan para mostrar el diagnóstico previo y no describen el estado final.
 Fecha de revisión: 22 de noviembre de 2026.
 
 ## Resumen ejecutivo
