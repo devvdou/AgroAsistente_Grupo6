@@ -10,7 +10,7 @@ from .forms import ConsultaForm, ContextoForm, EstadoLaborForm, EstimacionForm, 
 from .services import firebase_service
 from .services.estimacion_service import calcular_cantidad
 from .services.firebase_service import FirebaseNoDisponible
-from .services.orientation_provider import generar_orientacion
+from .services.orientation_provider import AdaptadorLocal, generar_orientacion
 from .services.weather_service import PronosticoNoDisponible, obtener_pronostico
 
 logger = logging.getLogger(__name__)
@@ -53,7 +53,7 @@ def configurar_contexto(request):
         return render(request, "agro/inicio.html", _base(request, form=form), status=400)
     data = form.cleaned_data
     contexto = {
-        "id": uuid.uuid4().hex,
+        "id": (_contexto(request) or {}).get("id") or uuid.uuid4().hex,
         "region": data["region"],
         "region_nombre": REGION_NOMBRES[data["region"]],
         "predio": data["predio"].strip(),
@@ -80,8 +80,10 @@ def consulta(request):
     form = ConsultaForm(request.POST or None)
     resultado = pronostico = None
     error_pronostico = ""
+    es_ganadera = contexto['modo'] == 'Ganadera'
     if request.method == "POST" and form.is_valid():
         pregunta = form.cleaned_data["pregunta"]
+        es_ganadera = AdaptadorLocal.es_ganadera(contexto, pregunta)
         try:
             resultado = generar_orientacion(contexto, pregunta)
         except Exception:
@@ -92,7 +94,7 @@ def consulta(request):
         except PronosticoNoDisponible:
             error_pronostico = "El pronóstico de Open-Meteo no está disponible en este momento."
     status = 400 if request.method == "POST" and not form.is_valid() else 200
-    return render(request, "agro/consulta.html", _base(request, form=form, resultado=resultado, pronostico=pronostico, error_pronostico=error_pronostico), status=status)
+    return render(request, "agro/consulta.html", _base(request, form=form, resultado=resultado, pronostico=pronostico, error_pronostico=error_pronostico, es_ganadera=es_ganadera), status=status)
 
 
 def labores(request):

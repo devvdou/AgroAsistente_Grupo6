@@ -40,6 +40,8 @@ class RespuestaVaciaError(Exception):
 def categoria_error(error):
     if isinstance(error, (TimeoutError, httpx.TimeoutException)):
         return 'timeout'
+    if isinstance(error, (httpx.NetworkError, httpx.RemoteProtocolError)):
+        return 'red_temporal'
     if isinstance(error, ConfiguracionGeminiError):
         return 'configuracion'
     if isinstance(error, RespuestaVaciaError):
@@ -218,6 +220,7 @@ class AdaptadorGemini(ProveedorOrientacion):
                 "No indiques frecuencia o dosis exacta sin datos técnicos. Si el cultivo preguntado difiere del contexto, adviértelo. "
                 "Para cantidades de fertilizante dirige a Estimación con una dosis técnica verificada. "
                 "Toda pregunta veterinaria requiere prudencia aunque el contexto sea agrícola."
+                " Usa texto plano sin Markdown ni asteriscos, con un paso por línea."
             ),
             max_output_tokens=400,
             # Este SDK no enumera MINIMAL; conservamos el mínimo predeterminado del modelo.
@@ -227,14 +230,14 @@ class AdaptadorGemini(ProveedorOrientacion):
                 try:
                     respuesta = self.cliente.models.generate_content(
                         model=self.modelo, contents=pregunta.strip(), config=config)
-                    texto = (respuesta.text or '').strip()
+                    texto = (respuesta.text or '').strip().replace('**', '')
                     if not texto:
                         raise RespuestaVaciaError('Respuesta vacía')
                     return ResultadoOrientacion(texto, 'gemini', reintentos=intento)
                 except Exception as error:
                     categoria = categoria_error(error)
                     logger.warning('Gemini clase=%s categoria=%s', type(error).__name__, categoria)
-                    if intento == 0 and categoria in ('timeout', 'rate_limit', 'error_temporal'):
+                    if intento == 0 and categoria in ('timeout', 'red_temporal', 'error_temporal'):
                         time.sleep(0.5)
                         continue
                     raise

@@ -25,9 +25,41 @@ class GeminiFinalTests(SimpleTestCase):
         r, n = self.ejecutar([httpx.ReadTimeout('prueba'), Mock(text='Respuesta')])
         self.assertEqual((r.tipo, r.reintentos, n), ('gemini', 1, 2))
 
-    def test_429_reintenta(self):
+    def test_429_no_reintenta(self):
         r, n = self.ejecutar([errors.ClientError(429, {}), Mock(text='Respuesta')])
-        self.assertEqual((r.tipo, n), ('gemini', 2))
+        self.assertEqual((p.categoria_error(r), n), ('rate_limit', 1))
+
+    def test_red_temporal_reintenta_una_vez(self):
+        for error in (httpx.ConnectError('prueba'), httpx.ReadError('prueba'), httpx.RemoteProtocolError('prueba')):
+            with self.subTest(error=type(error).__name__):
+                r, n = self.ejecutar([error, Mock(text='Respuesta')])
+                self.assertEqual((r.tipo, r.reintentos, n), ('gemini', 1, 2))
+
+    def test_red_y_5xx_persistentes_no_superan_dos_llamadas(self):
+        for error in (httpx.ConnectError('prueba'), errors.ServerError(500, {}), errors.ServerError(502, {}), errors.ServerError(503, {}), errors.ServerError(504, {})):
+            r, n = self.ejecutar([error, error, Mock(text='No debe llamarse')])
+            self.assertIs(r, error)
+            self.assertEqual(n, 2)
+
+    def test_solicitudes_invalidas_no_reintentan(self):
+        for codigo in (400, 404, 422):
+            error = errors.ClientError(codigo, {})
+            r, n = self.ejecutar([error, Mock(text='No debe llamarse')])
+            self.assertIs(r, error)
+            self.assertEqual(n, 1)
+
+    def test_429_activa_respaldo_contextual_y_finaliza(self):
+        with patch.dict('os.environ', {'GEMINI_API_KEY': 'clave-ficticia-para-test'}), patch.object(p.genai, 'Client') as cliente, patch.object(p, 'reservar_cuota', return_value=('fecha', 'id')), patch.object(p, 'liberar_reserva') as finalizar, patch.object(p.time, 'sleep') as pausa:
+            llamada = cliente.return_value.models.generate_content
+            llamada.side_effect = errors.ClientError(429, {})
+            r = p.generar_orientacion(CONTEXTO, '¿Cómo revisar el riego?')
+            self.assertEqual(r.tipo, 'local')
+            self.assertIn('riego', r.texto)
+            self.assertEqual(llamada.call_count, 1)
+            pausa.assert_not_called()
+            finalizar.assert_called_once_with(('fecha', 'id'))
+            self.assertEqual(cliente.call_args.kwargs['http_options'].timeout, 25000)
+            self.assertEqual(cliente.call_args.kwargs['http_options'].retry_options.attempts, 1)
 
     def test_503_reintenta(self):
         r, n = self.ejecutar([errors.ServerError(503, {}), Mock(text='Respuesta')])
@@ -69,7 +101,7 @@ class GeminiFinalTests(SimpleTestCase):
 
     def test_fallo_finaliza_fallida(self):
         for error in (TimeoutError(), p.RespuestaVaciaError(), errors.ClientError(403, {})):
-            with patch.object(p, 'reservar_cuota', return_value=('fecha', 'id')), patch.object(p.AdaptadorGemini, 'responder', side_effect=error), patch.object(p, 'liberar_reserva') as fallar, patch.object(p, 'confirmar_reserva') as confirmar:
+            with patch.dict('os.environ', {'GEMINI_API_KEY': 'clave-ficticia-para-test'}), patch.object(p.genai, 'Client'), patch.object(p, 'reservar_cuota', return_value=('fecha', 'id')), patch.object(p.AdaptadorGemini, 'responder', side_effect=error), patch.object(p, 'liberar_reserva') as fallar, patch.object(p, 'confirmar_reserva') as confirmar:
                 self.assertEqual(p.generar_orientacion(CONTEXTO, '¿Cómo regar?').tipo, 'local')
                 fallar.assert_called_once_with(('fecha', 'id'))
                 confirmar.assert_not_called()

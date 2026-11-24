@@ -22,6 +22,15 @@ CONTEXTO = {
 
 class VistasTests(SimpleTestCase):
     @patch('agro.views.obtener_pronostico', side_effect=PronosticoNoDisponible('prueba'))
+    @patch('agro.views.generar_orientacion', return_value=ResultadoOrientacion('Consulta a un veterinario.', 'gemini'))
+    @patch('agro.views.firebase_service.obtener_consumo', return_value={})
+    def test_pregunta_animal_muestra_aviso_veterinario_en_contexto_agricola(self, consumo, orientacion, clima):
+        self._con_contexto()
+        respuesta = self.client.post(reverse('agro:consulta'), {'pregunta': 'Mi vaca está enferma, ¿qué hago?'})
+        self.assertContains(respuesta, 'requieren un médico veterinario')
+        self.assertNotContains(respuesta, 'requieren un ingeniero agrónomo')
+
+    @patch('agro.views.obtener_pronostico', side_effect=PronosticoNoDisponible('prueba'))
     @patch('agro.views.firebase_service.obtener_consumo', return_value={'intentos': 3, 'exitosas': 1, 'fallidas': 1, 'bloqueadas': 1})
     def test_etiquetas_y_contadores_reflejan_resultado(self, consumo, clima):
         self._con_contexto()

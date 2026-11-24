@@ -1,5 +1,7 @@
 # Matriz de trazabilidad final
 
+Actualización del 24 de noviembre: HU-01/HU-04 verificadas conservando el ID y tres labores tras editar superficie, con estado Hecha persistido. HU-02/HU-06/HU-07/HU-08: cinco consultas reales, pronóstico de tres días, fórmula de 10 kg y negativa veterinaria. HU-03/HU-09: timeout controlado, 429 sin reintento, cuota real sin reservas pendientes y pruebas de idempotencia. Sprint 4: 65 pruebas OK, copia limpia con BAT y revisión a 390 px. Evidencia detallada en `PRUEBAS_Y_QA.md`; prueba manual aceptada y empaquetado autorizado por el usuario. Publicación pendiente de coordinación.
+
 Evidencia obtenida el 22 de noviembre de 2026. “Completa y verificada” exige prueba automática y recorrido manual real.
 
 | HU | Sprint | Criterio | Implementación | Evidencia | Estado |
@@ -14,5 +16,5 @@ Evidencia obtenida el 22 de noviembre de 2026. “Completa y verificada” exige
 | HU-08 | 3 | Ganadería sin tratamientos ni dosis | Prompt, filtro posterior y respaldo local | Negativas seguras, bloqueos inseguros y consulta veterinaria real | Completa y verificada |
 | HU-09 | 3 | Consumo y exceso atómicos | ID por intento, migración, finalización idempotente | Pruebas de límite/migración/concurrencia conceptual + contador real 6/5/1 | Completa y verificada |
 
-Sprint 4: 59 pruebas, interfaz de escritorio y móvil, CSRF, scripts reproducibles, repositorio aislado, clonación limpia y escaneo de secretos. HU-10 a HU-12 permanecen fuera del alcance.
+Sprint 4: 65 pruebas, interfaz de escritorio y móvil, CSRF, scripts reproducibles, repositorio aislado, clonación limpia y escaneo de secretos. HU-10 a HU-12 permanecen fuera del alcance.
 

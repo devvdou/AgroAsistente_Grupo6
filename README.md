@@ -18,7 +18,7 @@ Aplicación académica Django para pequeños productores de Chile. Implementa HU
 
 El instalador valida Python, crea `.venv`, instala `requirements.txt`, crea `.env` solo si falta, genera un `DJANGO_SECRET_KEY` aleatorio cuando conserva el ejemplo y crea `credentials`. No imprime secretos.
 
-`COMPROBAR_WINDOWS.bat` rechaza entornos ausentes, valores de ejemplo y credenciales inválidas antes de ejecutar `manage.py check` y las 59 pruebas. `INICIAR_WINDOWS.bat` hace la misma comprobación antes del servidor.
+`COMPROBAR_WINDOWS.bat` rechaza entornos ausentes, valores de ejemplo y credenciales inválidas antes de ejecutar `manage.py check` y las 65 pruebas. `INICIAR_WINDOWS.bat` hace la misma comprobación antes del servidor.
 
 ## Configuración
 
@@ -39,7 +39,11 @@ bash scripts/configurar_credenciales.sh
 - `/labores/`: crear, listar y cambiar estado.
 - `/estimacion/`: superficie × dosis técnica declarada.
 
-La cuota global usa fecha de Chile, ID por intento, transacciones Firebase y contadores de intentos, respuestas exitosas, fallidas, bloqueadas y excesos. Gemini tiene timeout de 25 segundos y un reintento únicamente para timeout, 429 o 5xx.
+La cuota global usa fecha de Chile, ID por intento, transacciones Firebase y contadores de intentos, respuestas exitosas, fallidas, bloqueadas y excesos. Gemini tiene timeout de 25 segundos y como máximo un reintento para timeout, errores transitorios de red o 5xx. Los errores 429, autenticación, permisos y solicitudes inválidas no reintentan.
+
+Se administra un predio por sesión. Editar el contexto conserva su identificador y las labores asociadas. El usuario aprobó la prueba manual y el empaquetado el 24 de noviembre de 2026. La publicación en GitHub se coordina por separado.
+
+Para una demostración en otro computador, transfiera las credenciales autorizadas por un canal separado del código. Complete únicamente los valores privados de `.env`, conservando el secreto Django generado en ese equipo, y coloque el JSON en `credentials/firebase-admin.json`. Nunca agregue esos archivos a Git, aunque el repositorio sea privado. Retírelos del laboratorio y revoque las credenciales de demostración después de la presentación.
 
 ## Pruebas
 

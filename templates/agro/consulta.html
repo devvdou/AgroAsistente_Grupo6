@@ -21,7 +21,7 @@
   </div>
   <div class="answer-copy"><h2>Orientación</h2><p>{{ resultado.texto }}</p></div>
   {% if resultado.aviso %}<p class="notice">{{ resultado.aviso }}</p>{% endif %}
-  {% if contexto.modo == 'Ganadera' %}<p class="professional-note"><strong>Revisión profesional:</strong> medicamentos, tratamientos, vacunas y dosis requieren un médico veterinario.</p>
+  {% if es_ganadera %}<p class="professional-note"><strong>Revisión profesional:</strong> medicamentos, tratamientos, vacunas y dosis requieren un médico veterinario.</p>
   {% else %}<p class="professional-note"><strong>Revisión profesional:</strong> plagas, enfermedades, pesticidas y dosis requieren un ingeniero agrónomo.</p>{% endif %}
 </article>
 {% endif %}
